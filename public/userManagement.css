@@ -1,0 +1,24 @@
+
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+
+}
+body{
+
+  
+   
+    background: radial-gradient(#fff,#ffd6d6) ;
+
+}
+.wrapper{
+
+    margin-top: 100px;
+}
+.list .list-group{
+    background-color: #f3a9a9;
+    height: 500px;
+}
