@@ -77,15 +77,71 @@
                   </div>
             </div>
             <div class="col-md-9">
-                <div class="container    p-5">
+                <div class="container   p-5">
                 
             
-            
-                   <!-- //product -->
+                  
+                    <h2>Product list </h2>
+                    <table class="table table-striped">
+                      <thead>
+                        <tr>
+                          <th scope="col">Image</th>
+                          <th scope="col">Product Name</th>
+                          <!-- <th scope="col">Brand</th>
+                          <th scope="col">Quantity</th> -->
+                          <th scope="col">Price</th>
+                          <th scope="col">Category</th>
+                          <th scope="col">Edit/Delete</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <% if (typeof product !== 'undefined') { %>
+                          <% product.forEach(product => { %>
+                            <tr>
+                              <td>
+                                <img src="<%= product.image %>" alt="<%= product.productName %>" class="img-thumbnail" style="width: 100px; height: 100px;">
+                              </td>
+                              <td>
+                                <%= product.productName %>
+                              </td>
+                              <!-- <td>
+                                <%= product.brand %>
+                              </td>
+                              <td>
+                                <%= product.quantity %>
+                              </td> -->
+                              <td>
+                                $<%= product.price %>
+                              </td>
+                              <td>
+                                <%= product.category.name %>
+                              </td>
+                              <td>
+                                <a href="/admin/editProduct/<%= product.id %>" class="btn btn-success">Edit</a>
+
+                              </td>
+                              <td>
+                                <!-- <a href="/admin/deleteProduct/<%= product.id %>" class="btn btn-danger">Delete</a> -->
+                                <form action="/admin/deleteProduct/<%= product.id %>" method="post" style="display: inline;"   enctype="multipart/form-data" id="toggleForm<%= product._id %>">
+                                 
+                                  <button class="p-1 m-2" type="submit"  onclick="confirmToggle('<%= product._id %>')">
+                                    <%= product.deleted ? 'Unlist' : 'List' %>
+                                  </button>
+                                </form>
+                              
+                              </td>
+                            </tr>
+                            <% }); %>
+                        <% } %>
+                      </tbody>
+                    </table>
+                    
+                  </div>
+          
                   
                
                  </div>
-            </div>
+           
         </div>
       
     </div>

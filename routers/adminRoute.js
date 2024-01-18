@@ -15,6 +15,9 @@ router.post('/deleteCategory/:id',adminController.deleteCategory)
 router.get('/product',adminController.getProducts)
 router.get('/addProduct',adminController.showAddform)
 router.post('/addProduct',adminController.uploadOptions.fields([{name:'image',maxCount:1},{name:'images',maxCount:10}]),adminController.addProduct)
+router.get('/editProduct/:id',adminController.getProductById)
+router.post('/editProduct/:id', adminController.uploadOptions.fields([{ name: 'image', maxCount: 1 }, { name: 'images', maxCount: 10 }]), adminController.editProduct);
+router.post('/deleteProduct/:id',adminController.deleteProduct)
 
 
 module.exports=router;

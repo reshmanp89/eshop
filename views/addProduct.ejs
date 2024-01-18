@@ -20,48 +20,50 @@
 
                 <div class="form-group">
                     <label for="productName">Enter product name</label>
-                    <input type="text" class="form-control" id="productName" name="productName" required>
+                    <input type="text" class="form-control" id="productName" name="productName" >
                 </div>
 
                 <div class="form-group">
                     <label for="brand">Enter brand</label>
-                    <input type="text" class="form-control" id="brand" name="brand" required>
+                    <input type="text" class="form-control" id="brand" name="brand" >
                 </div>
 
                 <div class="form-group">
                     <label for="price">Enter price</label>
-                    <input type="number" class="form-control" id="price" name="price" required>
+                    <input type="number" class="form-control" id="price" name="price" >
                 </div>
 
                 <div class="form-group">
                     <label for="category">Category:</label>
                     <select id="category" name="category" required>
-                        <% if (typeof categories !== 'undefined') { %>
-                            <% categories.forEach(category => { %>
-                                <option><%= category.name %></option>
-                            <% }); %>
-                        <% } %>
+                        <% if (typeof categories !=='undefined' ) { %>
+                            <% categories.forEach(category=> { %>
+                                <option>
+                                    <%= category.name %>
+                                </option>
+                                <% }); %>
+                                    <% } %>
                     </select>
                 </div>
 
                 <div class="form-group">
                     <label for="quantity">Enter Quantity</label>
-                    <input type="number" class="form-control" id="quantity" name="quantity" required>
+                    <input type="number" class="form-control" id="quantity" name="quantity" >
                 </div>
 
                 <div class="form-group">
                     <label for="rating">Enter rating</label>
-                    <input type="text" class="form-control" id="rating" name="rating" required>
+                    <input type="text" class="form-control" id="rating" name="rating" >
                 </div>
 
                 <div class="form-group">
                     <label for="image">Upload product image</label>
-                    <input type="file" class="form-control" id="image" name="image" required>
+                    <input type="file" class="form-control" id="image" name="image"  accept="image/png, image/jpeg, image/jpg">
                 </div>
 
                 <div class="form-group">
                     <label for="images">Upload additional product images</label>
-                    <input type="file" class="form-control" id="images" name="images" multiple>
+                    <input type="file" class="form-control" id="images" name="images" multiple   accept="image/png, image/jpeg, image/jpg">
                 </div>
 
                 <div class="form-group">

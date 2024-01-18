@@ -2,6 +2,7 @@ const express =require('express')
 const path=require('path')
 const app =express();
 const mongoose=require('mongoose')
+const flash=require('connect-flash')
 
 const homeRouter=require('./routers/home')
 const userRouter=require('./routers/user')
@@ -19,6 +20,7 @@ app.set("view engine", "ejs");
 app.use(express.json()); // Parse JSON
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOveride('_method'));
+
 //session
 
 app.use(session({
@@ -26,7 +28,7 @@ app.use(session({
     resave:false,
     saveUninitialized:true
 }))
-
+app.use(flash())
 //static file
 app.use(express.static(path.join(__dirname,"public")))
 
@@ -38,7 +40,7 @@ app.use(express.static(path.join(__dirname,"public")))
 
 app.use('/',homeRouter)
 app.use('/user',userRouter)
-app.use('/product',productRouter)
+// app.use('/product',productRouter)
 app.use('/admin',adminRouter)
 //db connection
 
@@ -51,6 +53,6 @@ mongoose.connect(process.env.MONGODB_URL)
 })
 
 
-app.listen(5001,()=>{
+app.listen(5000,()=>{
     console.log("server running");
 })

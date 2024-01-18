@@ -44,6 +44,10 @@ const mongoose=require('mongoose')
      dateCreated:{
         type:Date,
         default:Date.now,
+     },
+     deleted:{
+        type:Boolean,
+        default:false
      }
 
  })
