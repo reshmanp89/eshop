@@ -8,6 +8,7 @@ const sendVerificationEmail = require("../helpers/sendmail");
 const authMiddleware = require("../helpers/auth");
 const userController = require("../controller/userController");
 const Product = require("../models/product");
+ const { isAuthenticated, isBlockedByAdmin }= require('../helpers/auth')
 
 app.use(express.json());
 // router.use(authMiddleware.authenticateUser)
@@ -173,6 +174,14 @@ router.get("/product/:id", async (req, res) => {
   const productId = req.params.id;
   try {
     if (req.session.userLoggedIn) {
+      //check the user is blocked
+   const loggedInuserId=req.session.userId
+
+  
+   const loggedInUser=await User.findById(loggedInuserId)
+   if(loggedInUser.blocked){
+    return res.status(404).redirect('/')
+   }
       const product = await Product.findById(productId).populate("category");
     
 
@@ -196,9 +205,11 @@ router.get("/logout", (req, res) => {
     }
   });
 });
-router.get("/cart",userController.showCart)
+router.get("/cart",isAuthenticated,isBlockedByAdmin,userController.showCart)
 //addtocart
 router.post('/cart/add',userController.addToCart)
 //removefromcart
 router.get('/cart/remove/:id',userController.removeFromCart)
+//update the cartquantity
+router.post('/cart/updateQuantity/:productId',userController.updateQuantity)
 module.exports = router;

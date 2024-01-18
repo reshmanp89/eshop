@@ -96,47 +96,7 @@
     </div>
   </div>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const quantityInputs = document.querySelectorAll('.cartQuantity');
-      const subtotalTd = document.getElementById('cartSubtotal');
-      const totalTd = document.getElementById('cartTotal');
-  
-      quantityInputs.forEach(input => {
-        const productId = input.getAttribute('data-product-id');
-        const initialPrice = parseFloat(input.getAttribute('data-initial-price'));
-  
-        input.addEventListener('input', () => {
-          const newQuantity = parseInt(input.value, 10);
-  
-          console.log(`Updating quantity for product ${productId} to ${newQuantity}`);
-          console.log(`Price for product ${productId}: ${initialPrice}`);
-  
-          const newSubtotal = newQuantity * initialPrice;
-  
-          console.log(`New subtotal for product ${productId}: ₹${newSubtotal.toFixed(2)}`);
-  
-          // Update the quantity in the backend, for example, via AJAX
-          // ...
-  
-          // Perform calculations after a short delay to ensure DOM update
-          setTimeout(() => {
-            input.parentNode.nextElementSibling.innerText = `₹${newSubtotal.toFixed(2)}`;
-  
-            const allSubtotals = document.querySelectorAll('.subtotal');
-            let total = 0;
-            allSubtotals.forEach(subtotal => {
-              total += parseFloat(subtotal.innerText.replace('₹', ''));
-            });
-  
-            console.log(`New total: ₹${total.toFixed(2)}`);
-            
-            totalTd.innerText = `₹${total.toFixed(2)}`;
-          }, 0); // You can experiment with the delay
-        });
-      });
-    });
-  </script>
+ 
   
 
 <% } else { %>
@@ -188,36 +148,119 @@
             </ul>
         </div>
     </footer>
+    <!-- <script>
+        document.addEventListener('DOMContentLoaded', () => {
+          const quantityInputs = document.querySelectorAll('.cartQuantity');
+          const subtotalTd = document.getElementById('cartSubtotal');
+          const totalTd = document.getElementById('cartTotal');
+      
+          quantityInputs.forEach(input => {
+            const productId = input.getAttribute('data-product-id');
+            const initialPrice = parseFloat(input.getAttribute('data-initial-price'));
+      
+            input.addEventListener('input', () => {
+              const newQuantity = parseInt(input.value, 10);
+      
+              console.log(`Updating quantity for product ${productId} to ${newQuantity}`);
+              console.log(`Price for product ${productId}: ${initialPrice}`);
+      
+              const newSubtotal = newQuantity * initialPrice;
+      
+              console.log(`New subtotal for product ${productId}: ₹${newSubtotal.toFixed(2)}`);
+      
+              // Update the cartquantity in the backend
+              // ...
+      
+              // Perform calculations after a short delay to ensure DOM update
+              setTimeout(() => {
+                input.parentNode.nextElementSibling.innerText = `₹${newSubtotal.toFixed(2)}`;
+      
+                const allSubtotals = document.querySelectorAll('.subtotal');
+                let total = 0;
+                allSubtotals.forEach(subtotal => {
+                  total += parseFloat(subtotal.innerText.replace('₹', ''));
+                });
+      
+                console.log(`New total: ₹${total.toFixed(2)}`);
+                
+                totalTd.innerText = `₹${total.toFixed(2)}`;
+              }, 0); // You can experiment with the delay
+            });
+          });
+        });
+      </script> -->
 
-    <script>
-  var productImg=document.getElementById('productImg');
-  var smallimages=document.querySelectorAll('.small-img')
-     smallimages.forEach((smallimage,index)=>{
-        smallimage.onclick=function(){
-            productImg.src=smallimage.src
+      <script>
+        document.addEventListener('DOMContentLoaded', () => {
+          const quantityInputs = document.querySelectorAll('.cartQuantity');
+          const subtotalTd = document.getElementById('cartSubtotal');
+          const totalTd = document.getElementById('cartTotal');
+      
+          quantityInputs.forEach(input => {
+            const productId = input.getAttribute('data-product-id');
+            const initialPrice = parseFloat(input.getAttribute('data-initial-price'));
+      
+            input.addEventListener('input', () => {
+              const newQuantity = parseInt(input.value, 10);
+      
+              console.log(`Updating quantity for product ${productId} to ${newQuantity}`);
+              console.log(`Price for product ${productId}: ${initialPrice}`);
+      
+              // Update the quantity in the backend via AJAX
+              updateQuantityInBackend(productId, newQuantity)
+                .then(() => {
+                  const newSubtotal = newQuantity * initialPrice;
+      
+                  console.log(`New subtotal for product ${productId}: ₹${newSubtotal.toFixed(2)}`);
+      
+                  // Perform calculations after a short delay to ensure DOM update
+                  setTimeout(() => {
+                    input.parentNode.nextElementSibling.innerText = `₹${newSubtotal.toFixed(2)}`;
+      
+                    const allSubtotals = document.querySelectorAll('.subtotal');
+                    let total = 0;
+                    allSubtotals.forEach(subtotal => {
+                      total += parseFloat(subtotal.innerText.replace('₹', ''));
+                    });
+      
+                    console.log(`New total: ₹${total.toFixed(2)}`);
+      
+                    totalTd.innerText = `₹${total.toFixed(2)}`;
+                  }, 0);
+                })
+                .catch(error => {
+                  console.error(`Failed to update quantity for product ${productId}. Error:`, error);
+                  // Handle error appropriately (e.g., display an error message to the user)
+                });
+            });
+          });
+        });
+      
+        function updateQuantityInBackend(productId, newQuantity) {
+          // Implement your AJAX request here
+          return new Promise((resolve, reject) => {
+            // Example using Fetch API
+            fetch(`/user/cart/updateQuantity/${productId}`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ quantity: newQuantity }),
+            })
+              .then(response => {
+                if (response.ok) {
+                  resolve();
+                } else {
+                  reject(`Failed to update quantity for product ${productId}. Server responded with status: ${response.status}`);
+                }
+              })
+              .catch(error => {
+                reject(`Failed to update quantity for product ${productId}. Error: ${error}`);
+              });
+          });
         }
-     })
-    
-
-     //zoom product
-     document.getElementsByClassName('img-container').forEach(elem=>{
-
-let x,y,width,height;
-elem.onmouseenter =()=>{
-    const size=elem.getBoundingClientRect();
-    x=size.x;
-    y=size.y;
-    width=size.width;
-    height=size.height
-};
-elem.onmousemove = e =>{
-    const horizontal =(e.clientX - x)/width*100;
-    const vertical =(e.clientY - y)/height*100;
-    elem.style.setProperty('--x',horizontal +'%')
-    elem.style.setProperty('--y',vertical + '%')
-}
-})
-    </script>
+      </script>
+      
 </body>
 
 </html>

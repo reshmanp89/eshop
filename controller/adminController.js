@@ -37,7 +37,7 @@ exports.adminLogin = (req, res) => {
   res.render("admin");
 };
 
-exports.adminAuthenticate = async (req, res) => {
+exports.adminLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
     if (email === "npreshmanp@gmail.com" && password === "reshma123") {

@@ -3,7 +3,7 @@ const router=express.Router()
 const adminController=require('../controller/adminController')
 
 router.get('/',adminController.adminLogin)
-router.post('/',adminController.adminAuthenticate)
+router.post('/',adminController.adminLogin )
 router.get('/dashboard',adminController.adminDashboard)
 router.get('/userManagement',adminController.listUser)
 router.post('/blockUser/:id',adminController.blockUser)
