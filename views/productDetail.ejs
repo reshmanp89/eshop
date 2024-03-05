@@ -26,8 +26,18 @@
                         <li><a href="">Product</a></li>
                         <li><a href="">About</a></li>
                         <li><a href="">Contact</a></li>
-                        <li><a href="/user/logout">Logout</a></li>
-                        <li><a href=""><i class="fas fa-cart-shopping"></i></a></li>
+                        <% if (typeof user !== 'undefined') { %>
+                            <% if (user) { %>
+                               
+                                <li><a href="/user/logout">Logout</a></li>
+    
+                                <li><a href="/user/cart"><i class="fas fa-cart-shopping"></i></a></li>
+                                <li  class="text-danger"><a href="/user/profile"><i class="fa-solid fa-user   "></i>Hello,<%= user.username %></a></li>
+                            <% } else { %>
+                             
+                                <li><a href="/user/login">Login</a></li>
+                            <% } %>
+                            <% } %>
                     </ul>
                 </nav>
                 <span class="menu-icon"><i class="fas fa-bars"></i></span>
@@ -64,7 +74,7 @@
                 <h4 class="fw-bold">₹<%= product.price %></h4>
 
                            <!-- Add to Cart Form -->
-            <form action="/user/cart/add" method="post">
+            <form action="/user/cart" method="post">
                 <input type="hidden" name="productId" value="<%= product._id %>">
                 <label for="quantity">Quantity:</label>
                 <input class='cartQuantity' type="number" name="quantity" value="1" min="1">
@@ -72,7 +82,7 @@
                 <button type="submit" class="btn">Add To Cart</button>
             
             </form>
-                <a href="/user/cart" class="btn">View cart</a>
+                
                 <a href="" class="btn">Buy now</a>
                 <hr>
                 <p><strong>Product details</strong></p>

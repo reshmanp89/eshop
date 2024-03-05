@@ -56,3 +56,23 @@ header img{
 .input-box input::placeholder {
     color: white;
 }
+/* Chart Container Styles */
+#chartContainer {
+    margin-bottom: 20px;
+}
+
+/* Sales Chart Styles */
+#salesChart {
+    width: 100%;
+}
+
+/* Category Sales Chart Styles */
+#categorySalesChart {
+    width: 100%;
+}
+
+/* Product Quantity Chart Styles */
+#productQuantityChart {
+    width: 100%;
+    height: auto;
+}

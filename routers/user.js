@@ -8,13 +8,15 @@ const sendVerificationEmail = require("../helpers/sendmail");
 const authMiddleware = require("../helpers/auth");
 const userController = require("../controller/userController");
 const Product = require("../models/product");
- const { isAuthenticated, isBlockedByAdmin }= require('../helpers/auth')
+const { isAuthenticated, isBlockedByAdmin } = require("../helpers/auth");
+const Category = require("../models/category");
 
 app.use(express.json());
 // router.use(authMiddleware.authenticateUser)
 //usr login
 router.get("/login", (req, res) => {
   res.setHeader("Cache-Control", "no-store, private, must-revalidate");
+
   res.render("login");
 });
 
@@ -26,7 +28,7 @@ router.post("/login", async (req, res) => {
 
   try {
     const user = await User.findOne({ email });
-    console.log(user);
+
     if (!user) {
       return res
         .status(400)
@@ -113,7 +115,7 @@ router.post("/signup", async (req, res) => {
 
     //expiration time
 
-    const expirationTime = moment().add(15, "minutes").toDate();
+    const expirationTime = moment().add(1, "minutes").toDate();
 
     let user = new User({
       username: username,
@@ -125,8 +127,13 @@ router.post("/signup", async (req, res) => {
     });
 
     user = await user.save();
+    req.session.userEmail = user.email;
     sendVerificationEmail(user.email, user.otp, user.otpExpires);
-    res.status(200).redirect("/user/signup");
+    res
+      .status(200)
+      .render("verifyOtp", {
+        successMessage: "Verification email sent. Check your inbox.",
+      });
 
     // console.log(user);
   } catch (err) {
@@ -141,10 +148,30 @@ router.post("/verify", async (req, res) => {
 
   try {
     const user = await User.findOne({ otp });
+    const currentTime = new Date();
+    const otpExpires = user.otpExpires;
     if (user) {
-      user.is_varified = true;
-      await user.save();
-      return res.status(200).render("login");
+      if (currentTime < otpExpires) {
+        user.is_varified = true;
+        await user.save();
+
+        return res
+          .status(200)
+          .render("login", {
+            successMessage:
+              "Email verification successful. You can now log in.",
+          });
+      } else {
+        return res
+          .status(400)
+          .render("verifyOtp", {
+            error: "OTP has expired. Please request a new one.",
+          });
+      }
+    } else {
+      return res
+        .status(400)
+        .render("verifyOtp", { error: "Invalid OTP. Please try again." });
     }
   } catch (err) {
     console.log(err);
@@ -152,14 +179,44 @@ router.post("/verify", async (req, res) => {
   }
 });
 //route for displaying product
+
 router.get("/product", async (req, res) => {
   res.setHeader("Cache-Control", "no-store, private, must-revalidate");
 
   try {
     if (req.session.userLoggedIn) {
-      const products = await Product.find({ deleted: false });
-      // console.log(products);
-      return res.status(200).render("product", { products });
+      const userId = req.session.userId;
+      const user = await User.findOne({ _id: userId });
+      let products;
+
+      if (req.query.category) {
+        // Filter products based on the selected category
+        const category = await Category.findOne({ name: req.query.category });
+        if (category) {
+          products = await Product.find({
+            category: category._id,
+            deleted: false,
+          }).populate("category");
+        } else {
+          console.log("Selected category not found");
+        }
+      } else {
+        // Retrieve all products if no category is selected
+        products = await Product.find({ deleted: false }).populate("category");
+        // const product = await Product.find().populate("category");
+      }
+      //filter by price
+      if (req.query.priceRange) {
+        const priceRange = req.query.priceRange.split("-");
+        products = products.filter((product) => {
+          const productPrice = product.price;
+          return productPrice >= priceRange[0] && productPrice <= priceRange[1];
+        });
+      }
+
+      const categories = await Category.find({ blocked: false });
+
+      return res.status(200).render("product", { products, user, categories });
     } else {
       return res.redirect("/");
     }
@@ -175,17 +232,17 @@ router.get("/product/:id", async (req, res) => {
   try {
     if (req.session.userLoggedIn) {
       //check the user is blocked
-   const loggedInuserId=req.session.userId
+      const userId = req.session.userId;
+      const user = await User.findOne({ _id: userId });
+      const loggedInuserId = req.session.userId;
 
-  
-   const loggedInUser=await User.findById(loggedInuserId)
-   if(loggedInUser.blocked){
-    return res.status(404).redirect('/')
-   }
+      const loggedInUser = await User.findById(loggedInuserId);
+      if (loggedInUser.blocked) {
+        return res.status(404).redirect("/");
+      }
       const product = await Product.findById(productId).populate("category");
-    
 
-      return res.status(200).render("productDetail", { product });
+      return res.status(200).render("productDetail", { product, user });
     } else {
       return res.redirect("/");
     }
@@ -205,11 +262,65 @@ router.get("/logout", (req, res) => {
     }
   });
 });
-router.get("/cart",isAuthenticated,isBlockedByAdmin,userController.showCart)
+router.get("/cart", isAuthenticated, isBlockedByAdmin, userController.showCart);
 //addtocart
-router.post('/cart/add',userController.addToCart)
+router.post("/cart", userController.addToCart);
 //removefromcart
-router.get('/cart/remove/:id',userController.removeFromCart)
+router.get("/cart/remove/:id", userController.removeFromCart);
 //update the cartquantity
-router.post('/cart/updateQuantity/:productId',userController.updateQuantity)
+router.post("/cart/updateQuantity/:productId", userController.updateQuantity);
+//forgotPassword
+router.get("/forgot-password", userController.forgotPassword);
+router.post("/forgot-password", userController.forgotPassword);
+//resetPassword
+router.get("/reset-password", userController.resetPassword);
+router.post("/reset-password", userController.resetPassword);
+
+//userProfile
+router.get("/profile", userController.userProfile);
+router.get("/manageAdresses", userController.userManageAddresses);
+router.get("/addAddress", userController.addAdress);
+router.post("/addAddress", userController.addAdress);
+router.get("/editAddress/:id", userController.editAddress);
+router.post("/editAddress/:id", userController.usereditAddress);
+router.get("/deleteAddress/:id", userController.deleteAddress);
+router.get("/editProfile/:id", userController.editProfile);
+router.post("/edit/:id", userController.editUserDetails);
+router.get("/change-password/:id", userController.changePasswordform);
+router.post("/change-password/:id", userController.changePassword);
+//checkout
+
+router.get("/checkout", userController.showCheckOut);
+router.post("/placeorder", userController.placeOrder);
+
+//userprofile myorder
+router.get("/myOrder", userController.myOrder);
+router.post("/cancel-order/:orderId", userController.cancelOrder);
+
+//ordesuccess page
+router.get("/ordersuccess", userController.orderSuccess);
+//view orderdetailas
+router.get("/viewDetails/:orderId", userController.viewOrderDetails);
+//resendotp
+router.post("/resend-otp", userController.resendOtp);
+
+//search products
+
+router.post("/search", userController.search);
+//filter product based on categories
+router.get("/product", userController.categoryProducts);
+
+//display product in home page
+router.get("/getAllproducts", userController.producthome);
+
+//about-us
+router.get("/about-us", userController.getAboutus);
+//user selsect the coupon
+router.get("/applyCoupon", userController.getUserCoupon);
+//user invoice pdfDownload
+router.get("/orderDetails/pdf/:orderId", userController.invoicePdf);
+//return order
+router.post("/return-order/:orderId", userController.returnOrder);
+//paymentFailed
+router.get('/paymentFailed',userController.paymentFailed)
 module.exports = router;

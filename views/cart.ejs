@@ -28,10 +28,11 @@
                         <li><a href="">About</a></li>
                         <li><a href="">Contact</a></li>
                         <li><a href="/user/logout">Logout</a></li>
-                        <li><a href=""><i class="fas fa-cart-shopping"></i></a></li>
+                        <li><a href="/user/cart"><i class="fas fa-cart-shopping"></i></a></li>
+                        <li><a href="/user/profile"><i class="fa-solid fa-user"></i>Profile</a></li>
                     </ul>
                 </nav>
-                <span class="menu-icon"><i class="fas fa-bars"></i></span>
+              
             </div>
         </div>
     </div>
@@ -80,10 +81,7 @@
 
     <div class="total-price">
       <table>
-        <!-- <tr>
-          <td>Subtotal</td>
-          <td id="cartSubtotal">₹<%= calculateSubtotal(cart.products) %></td>
-        </tr> -->
+        
         <tr>
           <td>Shipping</td>
           <td>Free</td>
@@ -92,8 +90,12 @@
           <td>Total</td>
           <td id="cartTotal">₹<%= calculateSubtotal(cart.products) %></td>
         </tr>
+     
       </table>
+      
     </div>
+ 
+   <div class="text-center"> <button class="btn checkout p-5 "><a href="/user/checkout"  class="p-3 ">Proceed To CheckOut</a></button></div>
   </div>
 
  

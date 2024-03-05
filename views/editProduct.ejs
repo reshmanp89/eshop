@@ -71,6 +71,7 @@
                     <img src="<%= product.image %>" alt="Current Image" style="width: 200px; height: 200px;">
                 </div>
 
+                
                 <div class="form-group">
                     <label for="images">Upload additional product images</label>
                     <input type="file" class="form-control" id="images" name="images" multiple>
@@ -80,22 +81,15 @@
                                 <div class="col-md-3 mb-3">
                                     <img src="<%= image %>" alt="Image <%= index + 1 %>"
                                         class="img-thumbnail" style="width: 100%; height: auto;">
+                                    <input type="checkbox" name="deleteImages" value="<%= index %>"
+                                        id="deleteImage<%= index %>" class="delete-image-checkbox">
+                                    <label for="deleteImage<%= index %>" class="delete-image-label">Delete</label>
                                 </div>
                             <% }); %>
                         </div>
                     <% } %>
                 </div>
-                <div class="form-group">
-                    <label for="imagesToDelete">Select images to delete</label>
-                    <select multiple class="form-control" id="imagesToDelete" name="imagesToDelete">
-                        <% if (typeof product.images !== 'undefined') { %>
-                            <% product.images.forEach((image, index) => { %>
-                                <option value="<%= image %>">Image <%= index + 1 %></option>
-                            <% }); %>
-                        <% } %>
-                    </select>
-                </div>
-            
+                
 
                 <div class="form-group">
                     <label for="description">Enter description</label>

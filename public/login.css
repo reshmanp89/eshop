@@ -109,4 +109,11 @@ body{
  
   }
   
- 
+ h4{
+    color:white;
+ }
+ a{
+    text-decoration: none;
+    color: #333;
+
+ }
