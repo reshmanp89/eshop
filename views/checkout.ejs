@@ -6,6 +6,8 @@
     <title>Checkout</title>
     <link rel="stylesheet" href="/checkout.css">
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 </head>
 <body>
     <div class="header">
@@ -175,54 +177,6 @@
 <script>
 
  
-// function handlePayment() {
-//   const selectedPaymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
- 
-
-//   if (selectedPaymentMethod === 'razorpay') {
-//     const totalAmount = document.getElementById('totalAmount').value;
-//     const coupon = document.getElementById('coupon').value; // Get the selected coupon
-
-//     fetch('/user/placeorder', {
-//       method: 'POST',
-//       headers: {
-//         'Content-Type': 'application/json'
-//       },
-//       body: JSON.stringify({
-//         addressId: document.getElementById('address').value,
-//         paymentMethod: 'razorpay', // Hardcode payment method for now
-//         totalAmount: totalAmount,
-//         coupon: coupon // Include the coupon information in the request body
-//       })
-//     })
-//     .then(response => response.json())
-//     .then(data => {
-//       const options = {
-//         key: 'rzp_test_LMzjR4ggpHurDo',
-//         amount: totalAmount * 100,
-//         currency: 'INR',
-//         order_id: data.razorpayOrderID,
-//         handler: function(response) {
-//           window.location.href = '/user/ordersuccess';
-//         }
-//       };
-//       const rzp = new Razorpay(options);
-//       rzp.on('payment.failed', function (response){
-//         alert('Payment Failed! Please try again.');
-        
-//         window.location.href = '/user/paymentFailed';
-//       });
-//       rzp.open();
-//     })
-//     .catch(error => {
-//       console.error('Error creating Razorpay order:', error);
-//       alert('Error creating Razorpay order. Please try again later.');
-//       window.history.back(); // Redirect to previous page
-//     });
-//   } else {
-//     document.getElementById('orderForm').submit();
-//   }
-// }
 function handlePayment() {
   const selectedPaymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
 
@@ -277,7 +231,11 @@ function handlePayment() {
     const totalAmount = document.getElementById('totalAmount').value;
     if (totalAmount > 1000) {
       // Show alert for COD not available
-      alert('COD is not available for orders above Rs 1000.');
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'COD is not available for orders above Rs 1000.'
+      });
     } else {
       document.getElementById('orderForm').submit();
     }

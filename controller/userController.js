@@ -623,7 +623,7 @@ exports.placeOrder = async (req, res) => {
 
     if (req.body.coupon) {
       const selectedCoupon = req.body.coupon;
-      const coupon = await Coupon.findOne({ code: selectedCoupon });
+      const coupon = await Coupon.findOne({ code: selectedCoupon,deleted: false });
    
 
       if (!coupon) {
@@ -692,17 +692,15 @@ exports.placeOrder = async (req, res) => {
         paymentMethod: paymentMethod,
         razorpayOrderID: razorpayOrder.id,
       });
-      // Save the order
+     
       await order.save();
-      // Clear the user cart
-      // await Cart.findOneAndUpdate({ user: userId }, { $set: { products: [] } });
-      // Return the Razorpay order ID in the response
+     
       return res.status(200).json({ razorpayOrderID: razorpayOrder.id });
     } else {
       return res.status(400).send("Invalid payment method");
     }
 
-    // Save the order
+  
     await order.save();
     
 

@@ -108,7 +108,7 @@
                     </form>
              -->
           <h1>Add Coupon</h1>
-          <form action="/admin/coupons/add" method="POST">
+          <form action="/admin/coupons/add" method="POST"  onsubmit="return validateForm()">
             <div class="form-group">
               <label for="code">Coupon Code:</label>
               <input type="text" id="code" name="code" required>
@@ -188,6 +188,47 @@
         const form = document.getElementById('toggleCouponForm' + couponId);
         form.submit();
     }
+    function validateForm() {
+    var code = document.getElementById('code').value;
+    var discountType = document.getElementById('discountType').value;
+    var discountAmount = document.getElementById('discountAmount').value;
+    var discountPercentage = document.getElementById('discountPercentage').value;
+    var expiryDate = document.getElementById('expiryDate').value;
+    
+    // Check if coupon code is empty
+    if (code.trim() == '') {
+        alert("Coupon code cannot be empty");
+        return false;
+    }
+    
+    // Check if discount type is selected
+    if (discountType.trim() == '') {
+        alert("Please select a discount type");
+        return false;
+    }
+    
+    // Check if either discount amount or percentage is provided
+    if (discountType === 'flat' && (discountAmount.trim() == '' || parseFloat(discountAmount) === 0)) {
+        alert("Discount amount cannot be empty or zero");
+        return false;
+    }
+    if (discountType === 'percentage' && (discountPercentage.trim() == '' || parseFloat(discountPercentage) === 0)) {
+        alert("Discount percentage cannot be empty or zero");
+        return false;
+    }
+    
+    // Check if expiry date is in the past
+    var today = new Date();
+    var selectedDate = new Date(expiryDate);
+    if (selectedDate < today) {
+        alert("Expiry date must be in the future");
+        return false;
+    }
+    
+    // Form is valid
+    return true;
+}
+
   </script>
 </body>
 
