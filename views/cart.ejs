@@ -150,47 +150,7 @@
             </ul>
         </div>
     </footer>
-    <!-- <script>
-        document.addEventListener('DOMContentLoaded', () => {
-          const quantityInputs = document.querySelectorAll('.cartQuantity');
-          const subtotalTd = document.getElementById('cartSubtotal');
-          const totalTd = document.getElementById('cartTotal');
-      
-          quantityInputs.forEach(input => {
-            const productId = input.getAttribute('data-product-id');
-            const initialPrice = parseFloat(input.getAttribute('data-initial-price'));
-      
-            input.addEventListener('input', () => {
-              const newQuantity = parseInt(input.value, 10);
-      
-              console.log(`Updating quantity for product ${productId} to ${newQuantity}`);
-              console.log(`Price for product ${productId}: ${initialPrice}`);
-      
-              const newSubtotal = newQuantity * initialPrice;
-      
-              console.log(`New subtotal for product ${productId}: ₹${newSubtotal.toFixed(2)}`);
-      
-              // Update the cartquantity in the backend
-              // ...
-      
-              // Perform calculations after a short delay to ensure DOM update
-              setTimeout(() => {
-                input.parentNode.nextElementSibling.innerText = `₹${newSubtotal.toFixed(2)}`;
-      
-                const allSubtotals = document.querySelectorAll('.subtotal');
-                let total = 0;
-                allSubtotals.forEach(subtotal => {
-                  total += parseFloat(subtotal.innerText.replace('₹', ''));
-                });
-      
-                console.log(`New total: ₹${total.toFixed(2)}`);
-                
-                totalTd.innerText = `₹${total.toFixed(2)}`;
-              }, 0); // You can experiment with the delay
-            });
-          });
-        });
-      </script> -->
+    
 
       <script>
         document.addEventListener('DOMContentLoaded', () => {

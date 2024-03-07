@@ -26,7 +26,7 @@ exports.showCart = async (req, res) => {
   try {
     req.session.userLoggedIn = true;
     const userId = req.session.userId;
-    // console.log(userId);
+
     const cart = await Cart.findOne({ user: userId }).populate(
       "products.product"
     );
@@ -43,7 +43,6 @@ exports.addToCart = async (req, res) => {
     req.session.userLoggedIn = true;
     const { productId, quantity } = req.body;
     const userId = req.session.userId;
-    // console.log(userId);
 
     let cart = await Cart.findOne({ user: userId });
 
@@ -54,7 +53,6 @@ exports.addToCart = async (req, res) => {
     const existingProductIndex = cart.products.findIndex(
       (item) => item.product.toString() === productId
     );
-    // console.log('existingProductIndex:', existingProductIndex);
 
     if (existingProductIndex !== -1) {
       cart.products[existingProductIndex].quantity +=
@@ -65,7 +63,6 @@ exports.addToCart = async (req, res) => {
         { $inc: { quantity: -(quantity || 1) } },
         { new: true }
       );
-      //  console.log(updatedProduct);
     } else {
       const product = await Product.findById(productId);
 
@@ -85,10 +82,9 @@ exports.addToCart = async (req, res) => {
       { $inc: { quantity: -(quantity || 1) } },
       { new: true }
     );
-    // console.log(updatedProduct);
+
     await cart.save();
 
-    // res.status(200).json({ message: "Product added to cart successfully" });
     req.flash("success", "Product Added to the Cart succesfully");
     res.redirect(`/user/cart`);
   } catch (error) {
@@ -100,9 +96,9 @@ exports.addToCart = async (req, res) => {
 exports.removeFromCart = async (req, res) => {
   try {
     const productId = req.params.id;
-    //  console.log(productId);
+
     const userId = req.session.userId;
-    //  console.log('userId',userId);
+
     const cart = await Cart.findOne({ user: userId });
     if (!cart) {
       return res.status(400).render("cart", { message: "Cart not found" });
@@ -457,11 +453,9 @@ exports.changePassword = async (req, res) => {
     }
     //validate newpassword and confirmpassword
     if (newPassword !== confirmNewPassword) {
-      return res
-        .status(400)
-        .render("changePassword", {
-          error: "New password and confirmation do not match",
-        });
+      return res.status(400).render("changePassword", {
+        error: "New password and confirmation do not match",
+      });
     }
     user.password = bcrypt.hashSync(newPassword, 10);
 
@@ -480,7 +474,7 @@ exports.showCheckOut = async (req, res) => {
     const cart = await Cart.findOne({ user: userId }).populate(
       "products.product"
     );
-    const coupons = await Coupon.find({deleted:false});
+    const coupons = await Coupon.find({ deleted: false });
 
     if (!user || !cart) {
       return res
@@ -493,103 +487,6 @@ exports.showCheckOut = async (req, res) => {
     return res.status(500).send("internal server error");
   }
 };
-//  // place your order
-//  exports.placeOrder = async (req, res) => {
-//   try {
-//     console.log(req.body);
-//     const { addressId, paymentMethod } = req.body;
-//     const userId = req.session.userId;
-//     const user = await User.findById(userId);
-//     const cart = await Cart.findOne({ user: userId }).populate('products.product');
-
-//     // Total amount
-//     let totalAmount = cart.products.reduce((total, item) => total + item.product.price * item.quantity, 0);
-// console.log("totalamountttt",totalAmount);
-
-//     // Validate if the provided addressId is a valid ObjectId
-//     if (!mongoose.Types.ObjectId.isValid(addressId)) {
-//       return res.status(400).send("Invalid address ID");
-//     }
-//      // Check if a coupon is applied
-//      if (req.body.coupon) {
-//       const selectedCoupon = req.body.coupon;
-//       const coupon = await Coupon.findOne({ code: selectedCoupon });
-
-//       if (!coupon) {
-//         return res.status(404).send("Coupon not found");
-//       }
-
-//       const discountPercentage = coupon.discountPercentage;
-//       const discountAmount = (totalAmount * discountPercentage) / 100;
-//       totalAmount -= discountAmount;
-//     }
-
-//     const addressInstance = user.addresses.find(address =>
-//       address._id.equals(addressId)
-//     );
-
-//     if (!addressInstance) {
-//       return res.status(404).send("Address not found");
-//     }
-
-//     // Create order
-//     let order;
-//     if (paymentMethod === 'COD') {
-//       order = new Order({
-//         user: userId,
-//         items: cart.products.map(item => ({
-//           product: item.product._id,
-//           quantity: item.quantity,
-//           subtotal: item.product.price * item.quantity
-//         })),
-//         totalAmount: totalAmount,
-//         shippingAddress: addressInstance,
-//         paymentMethod: paymentMethod
-//       });
-//     } else if (paymentMethod === 'razorpay') {
-//       // Create order on Razorpay
-//       const razorpayOrder = await razorpay.orders.create({
-//         amount: totalAmount * 100,
-//         currency: 'INR',
-//         receipt: 'order_receipt_' + Math.floor(Math.random() * 1000),
-//         payment_capture: 1
-//       });
-//       console.log(razorpayOrder);
-
-//       order = new Order({
-//         user: userId,
-//         items: cart.products.map(item => ({
-//           product: item.product._id,
-//           quantity: item.quantity,
-//           subtotal: item.product.price * item.quantity
-//         })),
-//         totalAmount: totalAmount,
-//         shippingAddress: addressInstance,
-//         paymentMethod: paymentMethod,
-//         razorpayOrderID: razorpayOrder.id
-//       });
-//       // Save the order
-//     await order.save();
-//     // Clear the user cart
-//     await Cart.findOneAndUpdate({ user: userId }, { $set: { products: [] } });
-//        // Return the Razorpay order ID in the response
-//  return res.status(200).json({ razorpayOrderID: razorpayOrder.id });
-//     } else {
-//       return res.status(400).send("Invalid payment method");
-//     }
-
-//     // Save the order
-//     await order.save();
-
-//     // Clear the user cart
-//     await Cart.findOneAndUpdate({ user: userId }, { $set: { products: [] } });
-
-//     return res.status(200).redirect("/user/ordersuccess");
-//   } catch (error) {
-//     console.log(error);
-//     return res.status(500).send("Internal server error");
-//   }
-// };
 
 // place your order
 exports.placeOrder = async (req, res) => {
@@ -601,7 +498,7 @@ exports.placeOrder = async (req, res) => {
     const cart = await Cart.findOne({ user: userId }).populate(
       "products.product"
     );
-    
+
     // Total amount
     let totalAmount = cart.products.reduce(
       (total, item) => total + item.product.price * item.quantity,
@@ -612,24 +509,23 @@ exports.placeOrder = async (req, res) => {
     //   const errorMessage = "COD is not available for orders above Rs 1000.";
     //   return res.status(400).send(errorMessage);
     // }
-    
-    
-    
+
     // Validate if the provided addressId is a valid ObjectId
     if (!mongoose.Types.ObjectId.isValid(addressId)) {
       return res.status(400).send("Invalid address ID");
     }
-    
 
     if (req.body.coupon) {
       const selectedCoupon = req.body.coupon;
-      const coupon = await Coupon.findOne({ code: selectedCoupon,deleted: false });
-   
+      const coupon = await Coupon.findOne({
+        code: selectedCoupon,
+        deleted: false,
+      });
 
       if (!coupon) {
         return res.status(404).send("Coupon not found");
       }
-    
+
       if (totalAmount >= coupon.minimumPurchase) {
         let discountAmount = 0;
         if (coupon.discountType === "flat") {
@@ -639,12 +535,10 @@ exports.placeOrder = async (req, res) => {
         } else {
           return res.status(400).send("Invalid discount type");
         }
-    
-        totalAmount -= discountAmount;
-      } 
-    }
-    
 
+        totalAmount -= discountAmount;
+      }
+    }
 
     const addressInstance = user.addresses.find((address) =>
       address._id.equals(addressId)
@@ -663,7 +557,7 @@ exports.placeOrder = async (req, res) => {
           product: item.product._id,
           quantity: item.quantity,
           subtotal: item.product.price * item.quantity,
-          price:item.product.price,
+          price: item.product.price,
         })),
         totalAmount: totalAmount,
         shippingAddress: addressInstance,
@@ -677,7 +571,6 @@ exports.placeOrder = async (req, res) => {
         receipt: "order_receipt_" + Math.floor(Math.random() * 1000),
         payment_capture: 1,
       });
-     
 
       order = new Order({
         user: userId,
@@ -685,28 +578,22 @@ exports.placeOrder = async (req, res) => {
           product: item.product._id,
           quantity: item.quantity,
           subtotal: item.product.price * item.quantity,
-          price:item.product.price,
+          price: item.product.price,
         })),
         totalAmount: totalAmount,
         shippingAddress: addressInstance,
         paymentMethod: paymentMethod,
         razorpayOrderID: razorpayOrder.id,
       });
-     
+
       await order.save();
-     
+
       return res.status(200).json({ razorpayOrderID: razorpayOrder.id });
     } else {
       return res.status(400).send("Invalid payment method");
     }
 
-  
     await order.save();
-    
-
-
-
-   
 
     return res.status(200).redirect("/user/ordersuccess");
   } catch (error) {
@@ -715,8 +602,6 @@ exports.placeOrder = async (req, res) => {
     const orderId = order._id; // Assuming order variable is accessible here
     await Order.findByIdAndUpdate(orderId, { status: "payment pending" });
     return res.status(200).redirect("/user/paymentFailed");
-
-
   }
 };
 
@@ -748,12 +633,11 @@ exports.cancelOrder = async (req, res) => {
     if (!order) {
       return res.status(404).send("order not found");
     }
-    for(const item of order.items)
-    {
-      const product=item.product;
-      const quantityOrdered=item.quantity;
-      product.quantity+=quantityOrdered;
-      await product.save()
+    for (const item of order.items) {
+      const product = item.product;
+      const quantityOrdered = item.quantity;
+      product.quantity += quantityOrdered;
+      await product.save();
     }
     order.status = "canceled";
     await order.save();
@@ -770,9 +654,9 @@ exports.orderSuccess = async (req, res) => {
     console.log(userId);
 
     const user = await User.findOne({ _id: userId });
-    
-   await Cart.findOneAndUpdate({ user: userId }, { $set: { products: [] } });
-    
+
+    await Cart.findOneAndUpdate({ user: userId }, { $set: { products: [] } });
+
     const latestOrder = await Order.findOne({ user: userId })
       .sort({ createdDate: -1 })
       .populate("items.product");
@@ -790,7 +674,7 @@ exports.viewOrderDetails = async (req, res) => {
     const orderId = req.params.orderId;
     console.log(orderId);
     const order = await Order.findById(orderId).populate("items.product");
-    // const orders= await Order.find({user:userId}).populate('items.product')
+  
     console.log(order);
     if (!order) {
       return res.status(404).send("Order not found");
@@ -803,8 +687,6 @@ exports.viewOrderDetails = async (req, res) => {
 };
 
 //resend otp
-
-
 
 exports.resendOtp = async (req, res) => {
   try {
@@ -906,12 +788,10 @@ exports.getUserCoupon = async (req, res) => {
 
     // Check if the total amount meets the minimum purchase requirement
     if (totalAmount < coupon.minimumPurchase) {
-      return res
-        .status(400)
-        .json({
-          error:
-            "Total amount is less than minimum purchase required for this coupon",
-        });
+      return res.status(400).json({
+        error:
+          "Total amount is less than minimum purchase required for this coupon",
+      });
     }
 
     if (coupon.discountType === "flat") {
@@ -969,7 +849,7 @@ async function generateOrderInvoicePDF(order) {
   const fileName = `invoice-${order._id}.pdf`; // Filename for the PDF
 
   // Add content to the PDF document
-  
+
   pdfDoc.fontSize(10).text(`Total Amount: $${order.totalAmount}`).moveDown(0.5);
   pdfDoc.text(`Payment Method: ${order.paymentMethod}`).moveDown(0.5);
   pdfDoc.text(`Status: ${order.status}`).moveDown(1);
@@ -1012,10 +892,8 @@ exports.returnOrder = async (req, res) => {
       const product = item.product;
       const quantityReturned = item.quantity;
 
-     
       product.quantity += quantityReturned;
 
-    
       await product.save();
     }
     order.status = "returned";
@@ -1028,7 +906,7 @@ exports.returnOrder = async (req, res) => {
     res.status(500).send("Internal server error");
   }
 };
-exports.paymentFailed=async(req,res)=>{
+exports.paymentFailed = async (req, res) => {
   const userId = req.session.userId;
   console.log(userId);
 
@@ -1036,21 +914,15 @@ exports.paymentFailed=async(req,res)=>{
 
   const orders = await Order.find({ user: userId }).populate("items.product");
   const latestOrder = await Order.findOne({ user: userId })
-  .sort({ createdDate: -1 })
-  .populate("items.product");
+    .sort({ createdDate: -1 })
+    .populate("items.product");
   if (latestOrder) {
     latestOrder.status = "payment pending";
     await latestOrder.save();
   }
 
-
-
-
-
-
-
-  res.render("paymentFailed")
-}
+  res.render("paymentFailed");
+};
 //update order status payment pending
 exports.updateOrderStatus = async (req, res) => {
   const { orderId } = req.params;
@@ -1058,15 +930,22 @@ exports.updateOrderStatus = async (req, res) => {
 
   try {
     // Find the order by ID and update its status
-    const order = await Order.findByIdAndUpdate(orderId, { status: status }, { new: true });
+    const order = await Order.findByIdAndUpdate(
+      orderId,
+      { status: status },
+      { new: true }
+    );
 
     if (!order) {
-      return res.status(404).json({ error: 'Order not found' });
+      return res.status(404).json({ error: "Order not found" });
     }
 
-    return res.json({ message: 'Order status updated successfully', order: order });
+    return res.json({
+      message: "Order status updated successfully",
+      order: order,
+    });
   } catch (error) {
-    console.error('Error updating order status:', error);
-    return res.status(500).json({ error: 'Internal server error' });
+    console.error("Error updating order status:", error);
+    return res.status(500).json({ error: "Internal server error" });
   }
 };

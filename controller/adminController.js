@@ -28,14 +28,6 @@ const storage = multer.diskStorage({
     cb(null, Date.now() + "--" + file.originalname + extension);
   },
 });
-// const fileFilter = function (req, file, cb) {
-//     const isValid = FILE_TYPE[file.mimetype];
-//     if (isValid) {
-//       cb(null, true);
-//     } else {
-//       cb(new Error("Invalid image type"), false);
-//     }
-//   };
 
 exports.uploadOptions = multer({ storage: storage });
 
@@ -67,11 +59,7 @@ exports.adminLogout = async (req, res) => {
   res.redirect("/admin");
 };
 
-// exports.adminDashboard = (req, res) => {
-//   res.setHeader("Cache-Control", "no-store, private, must-revalidate");
 
-//   res.render("adminDashboard");
-// };
 exports.adminDashboard= async(req,res)=>{
   try{
 
@@ -184,7 +172,7 @@ exports.blockUser = async (req, res) => {
     res.status(500).send("internal server error");
   }
 };
-//category
+
 
 //addcategory
 exports.addCategory = async (req, res) => {
@@ -227,7 +215,7 @@ exports.getCategory = async (req, res) => {
 };
 //getcategorybyId
 exports.getCategoryId = async (req, res) => {
-  // console.log(req.params.id);
+ 
   try {
     const categoryId = req.params.id;
 
@@ -257,14 +245,14 @@ exports.editCategory = async (req, res) => {
     const updatedCategory = {
       name,
     };
-    // console.log(updatedCategory);
+
     const category = await Category.findByIdAndUpdate(
       categoryId,
       updatedCategory,
       { new: true }
     );
 
-    //   console.log(category);
+   
     res.status(200).redirect("/admin/categoryManagement");
   } catch (err) {
     console.log(err);
@@ -307,61 +295,7 @@ exports.showAddform = async (req, res) => {
     res.status(500).send("internal server error");
   }
 };
-//addProduct
 
-// exports.addProduct = async (req, res) => {
-//   try {
-//     const basePath = `/uploads/`;
-//     //find the category by name
-//     console.log(req.body.category);
-//     const category = await Category.findOne({ name: req.body.category });
-//     console.log(category);
-
-//     if (!category) {
-//       return res
-//         .status(400)
-//         .render("product", { data: "category is not found" });
-//     }
-
-//     //process multiple image
-//     const images = req.files.images.map((file) => basePath + file.filename);
-
-//     const product = {
-//       productName: req.body.productName,
-//       description: req.body.description,
-//       // image: `${basePath}${fileName}`,
-//       image: basePath + req.files.image[0].filename,
-//       images: images,
-//       brand: req.body.brand,
-//       price: req.body.price,
-//       category: category._id,
-//       quantity: req.body.quantity,
-//       rating: req.body.rating,
-//       dateCreated: req.body.dateCreated,
-//     };
-
-//     const newProduct = await Product.create(product);
-
-//     // console.log(newProduct);
-
-//     // res.status(200).render("product", { data: "product addeded" });
-//     res.status(200).redirect("/admin/product");
-//     // res.send('product added')
-
-//     if (!newProduct)
-//       return res
-//         .status(500)
-//         .render("addProduct", { data: "the product cannot be created" });
-//   } catch (error) {
-//     console.error(error.message);
-
-//     if (error.message === "Invalid image type") {
-//       res.status(400).render("addProduct", { error: "Invalid image type" });
-//     } else {
-//       res.status(500).render("addProduct", { error: "Internal server error" });
-//     }
-//   }
-// };
 exports.addProduct = async (req, res) => {
   try {
     const basePath = `/uploads/`;
@@ -379,9 +313,9 @@ exports.addProduct = async (req, res) => {
     await Jimp.read(mainImage.path)
       .then(image => {
         return image
-          .resize(800, 600) // Resize the image
-          .crop(0, 0, 800, 600) // Crop the image to 800x600 pixels
-          .write(`public/${mainImagePath}`); // Save the image
+          .resize(800, 600) 
+          .crop(0, 0, 800, 600) 
+          .write(`public/${mainImagePath}`); 
       });
 
     // Process multiple images
@@ -390,9 +324,9 @@ exports.addProduct = async (req, res) => {
       await Jimp.read(file.path)
         .then(image => {
           return image
-            .resize(800, 600) // Resize the image
-            .crop(0, 0, 800, 600) // Crop the image to 800x600 pixels
-            .write(`public/${imagePath}`); // Save the image
+            .resize(800, 600) 
+            .crop(0, 0, 800, 600) 
+            .write(`public/${imagePath}`); 
         });
       return imagePath;
     });
@@ -446,68 +380,7 @@ exports.getProductById = async (req, res) => {
   }
 };
 
-// edit product
 
-// exports.editProduct = async (req, res) => {
-//   // console.log(req.body);
-//   try {
-//     const productId = req.params.id;
-//     //   console.log(req.body);
-//     const basePath = "/uploads/";
-//     const existingProduct = await Product.findById(productId);
-
-//     const existingImages = existingProduct.images || [];
-//     const imagesToDelete = req.body.imagesToDelete || [];
-//     const updatedImages = existingImages.filter(
-//       (image) => !imagesToDelete.includes(image)
-//     );
-//     const newImages =
-//       req.files && req.files.images
-//         ? req.files.images.map((file) => basePath + file.filename)
-//         : [];
-//     const allImages = [...updatedImages, ...newImages];
-//     // const updatedImages =
-//     //   req.files && req.files.images
-//     //     ? existingImages.concat(
-//     //         req.files.images.map((file) => basePath + file.filename)
-//     //       )
-//     //     : existingImages;
-
-
-
-//     const image =
-//       req.files && req.files.image && req.files.image[0]
-//         ? basePath + req.files.image[0].filename
-//         : req.body.image;
-
-//     const updatedProduct = {
-//       productName: req.body.productName,
-//       description: req.body.description,
-//       // image: basePath + req.files.image[0].filename,
-//       image: image,
-//       images: allImages,
-
-//       brand: req.body.brand,
-//       price: req.body.price,
-//       category: req.body.category,
-//       quantity: req.body.quantity,
-//       rating: req.body.rating,
-//       dateCreated: req.body.dateCreated,
-//     };
-//     //   console.log(updatedProduct);
-//     const result = await Product.findByIdAndUpdate(productId, updatedProduct);
-//     //   console.log(result);
-//     if (!result) {
-//       return res
-//         .status(500)
-//         .render("editProduct", { data: "product is not updated" });
-//     }
-//     res.status(200).redirect("/admin/product");
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).render("editProduct", { data: "Error editing product" });
-//   }
-// };
 exports.editProduct = async (req, res) => {
   try {
     const productId = req.params.id;
@@ -515,11 +388,10 @@ exports.editProduct = async (req, res) => {
     const existingProduct = await Product.findById(productId);
 
     const existingImages = existingProduct.images || [];
-    const imagesToDelete = req.body.deleteImages || []; // Get the array of images to delete from checkboxes
-
+    const imagesToDelete = req.body.deleteImages || []; 
     // Filter out the images marked for deletion
     const updatedImages = existingImages.filter(
-      (image, index) => !imagesToDelete.includes(index.toString()) // Convert index to string because checkboxes return string values
+      (image, index) => !imagesToDelete.includes(index.toString()) 
     );
 
     // Process new images
@@ -533,9 +405,9 @@ exports.editProduct = async (req, res) => {
 
     // Process single main image
     const mainImage = req.files.image && req.files.image[0];
-    const image = mainImage ? basePath + mainImage.filename : existingProduct.image; // Use existing image if no new one is uploaded
+    const image = mainImage ? basePath + mainImage.filename : existingProduct.image; 
 
-    // Resize and crop main image if available
+   
     if (mainImage) {
       await Jimp.read(mainImage.path)
         .then(image => {
@@ -590,7 +462,6 @@ exports.listOrder = async (req, res) => {
   try {
     const orders = await Order.find();
 
-    // const validOrders = orders.filter(order => !order.deleted && !order.adminDeleted);
 
     res.render("orderManagement", { orders });
   } catch (error) {
@@ -931,26 +802,7 @@ exports.createCoupon = async (req, res) => {
   }
 }
 
-  //delete coupon
-//   exports.deleteCoupon= async(req,res)=>{
-//     try
-//     {
-//       const couponId= req.params.id;
-//       console.log(couponId);
-//       const updatedCoupon = await Coupon.findByIdAndUpdate(couponId, { deleted: true });
 
-//       if (!updatedCoupon) {
-//         return res.status(404).json({ message: 'Coupon not found' });
-//     }
-//     req.flash('success_msg', 'The coupon has been deleted');
-// res.redirect('/admin/couponManagement')
-
-//     }
-//     catch(error)
-//     {
-//       res.status(500).json({ error: "Internal server error" }); 
-//     }
-//   }
 exports.deleteCoupon = async (req, res) => {
 
       const couponId= req.params.id;
